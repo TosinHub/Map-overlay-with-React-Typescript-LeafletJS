@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState,  } from 'react';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapContainer, TileLayer, useMap } from 'react-leaflet';
@@ -18,8 +18,7 @@ const DraggableOverlayComponent = ({ planImageUri }: Props) => {
 
   const handleSliderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSliderValue(event.target.value);
-    overlay?.setRotation(Number(event.target.value))
-    // You'll pass this value to the DraggableOverlayComponent to update the overlay
+    overlay?.setRotation(Number(event.target.value)) 
   };
 
   const onImageClick = () => {
@@ -30,7 +29,7 @@ const DraggableOverlayComponent = ({ planImageUri }: Props) => {
     if (planImageUri) {
       const center = map.getCenter();
       const offset = 0.001;
-      // Calculate size of image based on the four axis it will be rendered
+
       const imageBounds: L.LatLngBoundsLiteral = [
         [center.lat - offset, center.lng - offset],
         [center.lat + offset, center.lng + offset]
@@ -38,7 +37,7 @@ const DraggableOverlayComponent = ({ planImageUri }: Props) => {
       
       const newOverlay = new DraggableImageOverlay(planImageUri, imageBounds, onImageClick);
       newOverlay.options.opacity = 0.9;
-      newOverlay.options.interactive = true; // Ensuers you can focus on the image with the mouse
+      newOverlay.options.interactive = true; 
       newOverlay.addTo(map);
 
       setOverlay(newOverlay);
@@ -60,7 +59,7 @@ const DraggableOverlayComponent = ({ planImageUri }: Props) => {
         onChange={handleSliderChange}
         style={styles}
         onMouseDown={(event) => {
-          // @ts-ignore
+          //@ts-ignore
           L.DomEvent.stopPropagation(event);
         }}
       />

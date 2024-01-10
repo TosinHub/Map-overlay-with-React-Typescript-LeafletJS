@@ -12,8 +12,6 @@ type Props = {
 const DraggableOverlayComponent = ({ planImageUri }: Props) => {
   const [sliderValue, setSliderValue] = useState<string>('0');
   const [showSlider, setShowSlider] = useState<boolean>(false);
-  const [sliderStyle, setSliderStyle] = useState<{ left: string, top: string }>({ left: '0', top: '0' })
-  const [overlayBounds, setOverlayBounds] = useState<L.LatLngBounds | null>(null);
   const [overlay, setOverlay] = useState<DraggableImageOverlay | null>(null);
 
   const map = useMap();
@@ -24,61 +22,32 @@ const DraggableOverlayComponent = ({ planImageUri }: Props) => {
     // You'll pass this value to the DraggableOverlayComponent to update the overlay
   };
 
-  const handleOverlayBoundsChange = useCallback((newBounds: L.LatLngBounds) => {
-    setOverlayBounds(newBounds);
-  }, []);
-
-  const onImageClick = () => setShowSlider(true)
-
-  const updateSliderPosition = useCallback(() => {
-    if (map && overlayBounds) {
-      const southWest = map.latLngToContainerPoint(overlayBounds.getSouthWest());
-      const northEast = map.latLngToContainerPoint(overlayBounds.getNorthEast());
-
-      // Position the slider just below the image
-      const sliderPosition = {
-        left: `${(southWest.x + northEast.x - 100) / 2}px`,
-        top: `${northEast.y - 20}px`,
-      };
-
-      setSliderStyle(sliderPosition);
-    }
-  }, [map, overlayBounds]);
-
-  useEffect(() => {
-    if (map) {
-      map.on('move', updateSliderPosition);
-      map.on('zoom', updateSliderPosition);
-
-      return () => {
-        map.off('move', updateSliderPosition);
-        map.off('zoom', updateSliderPosition);
-      };
-    }
-  }, [map, planImageUri, updateSliderPosition]);
+  const onImageClick = () => {
+    setShowSlider(true)
+  }
 
   useEffect(() => {
     if (planImageUri) {
       const center = map.getCenter();
       const offset = 0.001;
+      // Calculate size of image based on the four axis it will be rendered
       const imageBounds: L.LatLngBoundsLiteral = [
         [center.lat - offset, center.lng - offset],
         [center.lat + offset, center.lng + offset]
       ];
-
-      const newOverlay = new DraggableImageOverlay(planImageUri, imageBounds, onImageClick, handleOverlayBoundsChange);
+      
+      const newOverlay = new DraggableImageOverlay(planImageUri, imageBounds, onImageClick);
       newOverlay.options.opacity = 0.9;
-      newOverlay.options.interactive = true;
+      newOverlay.options.interactive = true; // Ensuers you can focus on the image with the mouse
       newOverlay.addTo(map);
 
       setOverlay(newOverlay);
     }
-  }, [map, planImageUri, handleOverlayBoundsChange]);
+  }, [map, planImageUri]);
 
   const styles = {
     position: 'absolute' as 'absolute',
     zIndex: 1000,
-    ...sliderStyle,
   }
 
   return showSlider ? (

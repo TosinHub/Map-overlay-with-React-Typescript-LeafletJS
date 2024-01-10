@@ -1,17 +1,19 @@
 import { useState } from "react";
 import MapView from "./components/MapView";
 import UploadFile from "./components/UploadFile";
-import DisplayFile from "./components/DisplayFile";
 import './App.css'
+import { convertPdfToImage } from "./utils";
 
 function App() {
-  const [pdf, setPdf] = useState<File | null>(null)
   const [imageUri, setImageUri] = useState<string | null>(null)
+
+  const onSubmit = (pdf: File) => {
+    convertPdfToImage(pdf).then(setImageUri)
+  }
   return (
     <div className="App" >
-      <UploadFile onSubmit={setPdf} />
+      <UploadFile onSubmit={onSubmit} />
       <MapView planImageUri={imageUri} />
-      {pdf && <DisplayFile file={pdf} onImageReady={setImageUri} />}
     </div>
   );
 }

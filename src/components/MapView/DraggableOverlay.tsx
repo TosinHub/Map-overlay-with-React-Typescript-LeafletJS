@@ -6,27 +6,26 @@ L.LatLng.prototype.latLngOffset = function (latOffset: number, lngOffset: number
   return L.latLng(this.lat + latOffset, this.lng + lngOffset);
 };
 
+// Extend the leaflet ImageOverlay class to add dragging functionality to the image
 class DraggableImageOverlay extends L.ImageOverlay {
   private dragging = false;
   private startLatLng: L.LatLng | null = null;
   private currentRotation: number = 0;
-  private currentPosition: { x: number; y: number } = { x: 0, y: 0 };
 
+  // Used to show the controls when the image is clicked on
   onClick: (event: MouseEvent) => void;
-  updateBoundsCallback: (event: L.LatLngBounds) => void;
 
-  constructor(url: string, bounds: L.LatLngBoundsExpression, onClick: (event: MouseEvent) => void, updateBoundsCallback: (bounds: L.LatLngBounds) => void) {
+  constructor(url: string, bounds: L.LatLngBoundsExpression, onClick: (event: MouseEvent) => void) {
     super(url, bounds);
 
     this.onClick = onClick;
-    this.updateBoundsCallback = updateBoundsCallback;
 
     this.on('add', () => {
       const img = this.getElement();
       // @ts-ignore
-      img.addEventListener('click', this.onClick);
+      img.addEventListener('click', this.onClick); // Add event listener to show controls
       // @ts-ignore
-      img.addEventListener('mousedown', this.onMouseDown);
+      img.addEventListener('mousedown', this.onMouseDown); // add event listener to move and update position of the image
       // @ts-ignore
       img.style.cursor = 'grab';
     });
@@ -42,9 +41,7 @@ class DraggableImageOverlay extends L.ImageOverlay {
 
     const img = this.getElement();
     // @ts-ignore
-    img.style.cursor = 'grabbing';
-    const bounds = this.getBounds();
-    this.updateBoundsCallback(bounds)
+    img.style.cursor = 'grabbing'; // Update cursor to show image is being moved or grabbed
 
     document.addEventListener('mousemove', this.onMouseMove);
     document.addEventListener('mouseup', this.onMouseUp);
@@ -68,7 +65,6 @@ class DraggableImageOverlay extends L.ImageOverlay {
 
     // Set new bounds
     const newBounds = L.latLngBounds(newSouthWest, newNorthEast);
-    this.updateBoundsCallback(newBounds)
     this.setBounds(newBounds);
 
     this.startLatLng = currentLatLng;
@@ -86,11 +82,14 @@ class DraggableImageOverlay extends L.ImageOverlay {
   private updateTransform() {
     const img = this.getElement();
     if (img) {
+      // Handle image rotation via transform
       img.style.transform += `rotate(${this.currentRotation}deg)`;
     }
   }
 
+  // Handles rotation of image
   setRotation(angle: number) {
+    // Store current rotation so this can be referred to later when updating other image properties
     this.currentRotation = angle;
     this.updateTransform();
   }

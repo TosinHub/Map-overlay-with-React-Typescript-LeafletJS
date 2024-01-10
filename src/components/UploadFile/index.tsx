@@ -8,6 +8,7 @@ type Props = {
   }
 
 const UploadFile = ({ onSubmit }: Props) => {
+    
     const onDrop = useCallback((acceptedFiles: File[]) => {
         const file = acceptedFiles[0]
         if (file) {

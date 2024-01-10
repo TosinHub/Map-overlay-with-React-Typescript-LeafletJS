@@ -21,10 +21,10 @@ class DraggableImageOverlay extends L.ImageOverlay {
     this.onClick = onClick;
 
     this.on('add', () => {
-      const img = this.getElement();
+      const img : any = this.getElement();
       // @ts-ignore
       img.addEventListener('click', this.onClick); // Add event listener to show controls
-      // @ts-ignore
+     
       img.addEventListener('mousedown', this.onMouseDown); // add event listener to move and update position of the image
       // @ts-ignore
       img.style.cursor = 'grab';
